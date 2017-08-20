@@ -11,12 +11,12 @@
 #include <tf2_ros/transform_broadcaster.h>
 
 static ros::Publisher odom_pub;
+static ros::Publisher pose_cov_pub;
 static ros::Publisher pose_pub;
-static ros::Publisher mavros_pose_pub;
 static KalmanFilter kf;
 static nav_msgs::Odometry odom_msg;
-static geometry_msgs::PoseWithCovarianceStamped pose_msg;
-static geometry_msgs::PoseStamped mavros_pose_msg;
+static geometry_msgs::PoseStamped pose_msg;
+static geometry_msgs::PoseWithCovarianceStamped pose_cov_msg;
 static tf2_ros::TransformBroadcaster* tfb;
 
 static std::string fixed_frame_id;
@@ -139,53 +139,52 @@ static void vicon_callback(const vicon::Subject::ConstPtr &msg)
     }
   }
 
-  pose_msg.header = odom_msg.header;
-  pose_msg.pose.pose.position = odom_msg.pose.pose.position;
-  pose_msg.pose.pose.orientation = msg->orientation;
+  pose_cov_msg.header = odom_msg.header;
+  pose_cov_msg.pose.pose.position = odom_msg.pose.pose.position;
+  pose_cov_msg.pose.pose.orientation = msg->orientation;
 
   // This should be the variance of the noise present in the raw vicon data.
   float variance = 0.01 * 0.01;
 
   if (apply_position_noise) {
-    pose_msg.pose.pose.position.x += pos_injected_noise_stddev *
+    pose_cov_msg.pose.pose.position.x += pos_injected_noise_stddev *
                                      normal_dist->operator()(*generator);
-    pose_msg.pose.pose.position.y += pos_injected_noise_stddev *
+    pose_cov_msg.pose.pose.position.y += pos_injected_noise_stddev *
                                      normal_dist->operator()(*generator);
-    pose_msg.pose.pose.position.z += pos_injected_noise_stddev *
+    pose_cov_msg.pose.pose.position.z += pos_injected_noise_stddev *
                                      normal_dist->operator()(*generator);
     variance += std::pow(pos_injected_noise_stddev, 2);
   }
 
   if (apply_extra_position_noise)
   {
-    if (high_noise_x_min < odom_msg.pose.pose.position.x && 
+    if (high_noise_x_min < odom_msg.pose.pose.position.x &&
         odom_msg.pose.pose.position.x < high_noise_x_max &&
-        high_noise_y_min < odom_msg.pose.pose.position.y && 
+        high_noise_y_min < odom_msg.pose.pose.position.y &&
         odom_msg.pose.pose.position.y < high_noise_y_max &&
-        high_noise_z_min < odom_msg.pose.pose.position.z && 
+        high_noise_z_min < odom_msg.pose.pose.position.z &&
         odom_msg.pose.pose.position.z < high_noise_z_max)
     {
-      pose_msg.pose.pose.position.x += pos_injected_extra_noise_stddev *
+      pose_cov_msg.pose.pose.position.x += pos_injected_extra_noise_stddev *
                                        normal_dist->operator()(*generator);
-      pose_msg.pose.pose.position.y += pos_injected_extra_noise_stddev *
+      pose_cov_msg.pose.pose.position.y += pos_injected_extra_noise_stddev *
                                        normal_dist->operator()(*generator);
-      pose_msg.pose.pose.position.z += pos_injected_extra_noise_stddev *
+      pose_cov_msg.pose.pose.position.z += pos_injected_extra_noise_stddev *
                                        normal_dist->operator()(*generator);
       variance += std::pow(pos_injected_extra_noise_stddev, 2);
     }
   }
 
-  pose_msg.pose.covariance[0] = variance;
-  pose_msg.pose.covariance[7] = variance;
-  pose_msg.pose.covariance[14] = variance;
-  pose_msg.pose.covariance[35] = 0.02 * 0.02;
+  pose_cov_msg.pose.covariance[0] = variance;
+  pose_cov_msg.pose.covariance[7] = variance;
+  pose_cov_msg.pose.covariance[14] = variance;
+  pose_cov_msg.pose.covariance[35] = 0.02 * 0.02;
 
+  pose_cov_pub.publish(pose_cov_msg);
+
+  pose_msg.header = pose_cov_msg.header;
+  pose_msg.pose = pose_cov_msg.pose.pose;
   pose_pub.publish(pose_msg);
-
-  // HAX for mavros.
-  mavros_pose_msg.header = pose_msg.header;
-  mavros_pose_msg.pose = pose_msg.pose.pose;
-  mavros_pose_pub.publish(mavros_pose_msg);
 
   if (num_visible_markers >= min_visible_markers)
   {
@@ -336,9 +335,8 @@ int main(int argc, char **argv)
                                           ros::TransportHints().tcpNoDelay());
 
   odom_pub = n.advertise<nav_msgs::Odometry>("odom", 10);
-  pose_pub = n.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose", 10);
-  // Mavros needs a PoseStamped message.
-  mavros_pose_pub = n.advertise<geometry_msgs::PoseStamped>("pose_for_mavros", 10);
+  pose_pub = n.advertise<geometry_msgs::PoseStamped>("pose", 10);
+  pose_cov_pub = n.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose_cov", 10);
 
   consecutive_occlusions = 0;
 
