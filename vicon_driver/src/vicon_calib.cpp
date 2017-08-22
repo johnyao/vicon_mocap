@@ -225,8 +225,7 @@ namespace ViconCalib
           position.y() = pos[1].as<double>();
           position.z() = pos[2].as<double>();
 #endif
-          marker_pos_map.insert(std::make_pair<std::string, Eigen::Vector3d>(
-                  name, position));
+          marker_pos_map.insert(std::make_pair(name, position));
         }
         ret = true;
       }
