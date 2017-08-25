@@ -34,7 +34,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS message_runtime roscpp geometry_msgs nav_msgs std_srvs vicon_driver
-  DEPENDS EIGEN3 Boost
+  DEPENDS EIGEN3
 )
 
 include_directories(
