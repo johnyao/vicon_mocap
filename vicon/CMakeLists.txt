@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vicon)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
 find_package(Eigen3 REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -35,11 +34,11 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS message_runtime roscpp geometry_msgs nav_msgs std_srvs vicon_driver
-  DEPENDS Eigen3 Boost
+  DEPENDS EIGEN3 Boost
 )
 
 include_directories(
-  ${EIGEN3_INCLUDE_DIR}
+  ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
 )
@@ -52,7 +51,6 @@ link_directories(
 )
 
 add_executable(vicon src/vicon.cpp)
-add_dependencies(vicon vicon_driver)
 add_dependencies(vicon ${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 
 target_link_libraries(vicon
@@ -63,7 +61,6 @@ target_link_libraries(vicon
 )
 
 add_executable(vicon_calibrate src/vicon_calibrate.cpp)
-add_dependencies(vicon_calibrate vicon_driver)
 add_dependencies(vicon_calibrate ${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
 
 target_link_libraries(vicon_calibrate

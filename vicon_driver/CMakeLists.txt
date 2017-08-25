@@ -1,7 +1,6 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.0)
 project(vicon_driver)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
 find_package(Eigen3 REQUIRED)
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -37,12 +36,13 @@ endif(USE_OLD_YAML_CPP_API)
 catkin_package(
   # Below is horrible hack for vicon to find the boost libs needed for the ViconSDK
   INCLUDE_DIRS include ${VICON_SDK_DIR}
+  DEPENDS EIGEN3
   LIBRARIES vicon_driver
 )
 
 include_directories(
   include
-  ${EIGEN3_INCLUDE_DIR}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 add_definitions("-Wall -Wextra -O2 -fPIC")
 

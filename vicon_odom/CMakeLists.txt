@@ -1,7 +1,6 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.0)
 project(vicon_odom)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
 find_package(Eigen3 REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -12,13 +11,12 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp vicon tf2_ros
-  DEPENDS Eigen3
+  DEPENDS EIGEN3
 )
 
 include_directories(
   include
-  ${EIGEN3_INCLUDE_DIR}
+  ${EIGEN3_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
