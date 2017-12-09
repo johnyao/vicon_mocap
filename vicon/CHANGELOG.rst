@@ -2,6 +2,16 @@
 Changelog for package vicon
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.3 (2017-12-08)
+------------------
+* Remove Boost from vicon CMakeLists catkin_package depends
+  Boost is not needed in the headers. This also has the benefit of
+  removing the cmake Boost warning.
+* Find Eigen3 using native CMake module to avoid warnings.
+  CMake version required is now 3.0.0 which means Ubuntu 14.04 will not
+  work out of the box. Trusty ships with CMake 2.8.
+* Contributors: Alex Spitzer
+
 0.0.2 (2017-08-04)
 ------------------
 * Fix metapackage directory structure to work with newer catkin tools

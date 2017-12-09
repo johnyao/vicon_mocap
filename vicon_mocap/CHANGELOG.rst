@@ -2,6 +2,9 @@
 Changelog for package vicon_mocap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.3 (2017-12-08)
+------------------
+
 0.0.2 (2017-08-04)
 ------------------
 * Merge branch 'feature/covariance' into develop
