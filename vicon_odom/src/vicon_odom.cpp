@@ -180,6 +180,11 @@ static void vicon_callback(const vicon::Subject::ConstPtr &msg)
   pose_cov_msg.pose.covariance[14] = variance;
   pose_cov_msg.pose.covariance[35] = 0.02 * 0.02;
 
+  odom_msg.pose.covariance[0] = variance;
+  odom_msg.pose.covariance[7] = variance;
+  odom_msg.pose.covariance[14] = variance;
+  odom_msg.pose.covariance[35] = 0.02 * 0.02;
+
   pose_cov_pub.publish(pose_cov_msg);
 
   pose_msg.header = pose_cov_msg.header;
