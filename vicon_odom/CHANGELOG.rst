@@ -2,6 +2,11 @@
 Changelog for package vicon_odom
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.4 (2019-02-11)
+------------------
+* vicon_odom: Also set covariance in the Odometry publisher
+* Contributors: Alex Spitzer
+
 0.0.3 (2017-12-08)
 ------------------
 * Find Eigen3 using native CMake module to avoid warnings.

@@ -2,6 +2,9 @@
 Changelog for package vicon
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.4 (2019-02-11)
+------------------
+
 0.0.3 (2017-12-08)
 ------------------
 * Remove Boost from vicon CMakeLists catkin_package depends
