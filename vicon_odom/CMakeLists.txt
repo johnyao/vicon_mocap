@@ -5,6 +5,7 @@ find_package(Eigen3 REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  robot_msgs
   vicon
   tf2_ros
 )

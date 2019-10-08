@@ -5,6 +5,7 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <robot_msgs/OdomNoCov.h>
 #include <vicon/Subject.h>
 #include <vicon_odom/filter.h>
 #include <Eigen/Geometry>
@@ -17,7 +18,10 @@ static KalmanFilter kf;
 static nav_msgs::Odometry odom_msg;
 static geometry_msgs::PoseStamped pose_msg;
 static geometry_msgs::PoseWithCovarianceStamped pose_cov_msg;
+static robot_msgs::OdomNoCov odom_nocov_msg;
 static tf2_ros::TransformBroadcaster* tfb;
+
+static bool publish_nocov_odom;
 
 static std::string fixed_frame_id;
 static std::string base_frame_id;
@@ -237,7 +241,18 @@ static void vicon_callback(const vicon::Subject::ConstPtr &msg)
     odom_msg.twist.twist.angular.z = 0.0;
   }
 
-  odom_pub.publish(odom_msg);
+  odom_nocov_msg.header = odom_msg.header;
+  odom_nocov_msg.pose = odom_msg.pose.pose;
+  odom_nocov_msg.twist = odom_msg.twist.twist;
+
+  if (!publish_nocov_odom)
+  {
+    odom_pub.publish(odom_msg);
+  }
+  else
+  {
+    odom_pub.publish(odom_nocov_msg);
+  }
 }
 
 int main(int argc, char **argv)
@@ -320,6 +335,12 @@ int main(int argc, char **argv)
   dt = 1/vicon_fps;
   desired_dt = dt;
 
+  publish_nocov_odom = false;
+  if (n.hasParam("publish_nocov_odom"))
+  {
+    n.getParam("publish_nocov_odom", publish_nocov_odom);
+  }
+
   proc_noise_diag(0) = 0.5*max_accel*dt*dt;
   proc_noise_diag(1) = 0.5*max_accel*dt*dt;
   proc_noise_diag(2) = 0.5*max_accel*dt*dt;
@@ -339,7 +360,15 @@ int main(int argc, char **argv)
   ros::Subscriber vicon_sub = n.subscribe("vicon", 10, &vicon_callback,
                                           ros::TransportHints().tcpNoDelay());
 
-  odom_pub = n.advertise<nav_msgs::Odometry>("odom", 10);
+  if (!publish_nocov_odom)
+  {
+    odom_pub = n.advertise<nav_msgs::Odometry>("odom", 10);
+  }
+  else
+  {
+    odom_pub = n.advertise<robot_msgs::OdomNoCov>("odom", 10);
+  }
+
   pose_pub = n.advertise<geometry_msgs::PoseStamped>("pose", 10);
   pose_cov_pub = n.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose_cov", 10);
 
