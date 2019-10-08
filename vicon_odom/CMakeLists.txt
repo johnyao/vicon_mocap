@@ -30,9 +30,18 @@ add_executable(vicon_odom
   src/filter.cpp
 )
 
+add_executable(vicon_odom_simple
+  src/vicon_odom_simple.cpp
+)
+
 add_dependencies(vicon_odom vicon_generate_messages_cpp)
+add_dependencies(vicon_odom_simple vicon_generate_messages_cpp)
 
 target_link_libraries(vicon_odom
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(vicon_odom_simple
   ${catkin_LIBRARIES}
 )
 
