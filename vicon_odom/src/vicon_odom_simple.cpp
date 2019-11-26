@@ -49,7 +49,7 @@ static void vicon_callback(const vicon::Subject::ConstPtr &msg) {
     odom_msg.twist.linear.y = vel(1);
     odom_msg.twist.linear.z = vel(2);
 
-    Eigen::Matrix3d R_dot = (R - R_prev)/dt;
+    Eigen::Matrix3d R_dot = (R - R_prev) / dt;
     Eigen::Matrix3d w_hat = R_dot * R.transpose();
 
     odom_msg.twist.angular.x = w_hat(2, 1);
@@ -72,8 +72,8 @@ int main(int argc, char **argv) {
   ROS_ASSERT(vicon_fps > 0.0);
   desired_dt = 1 / vicon_fps;
 
-  ros::Subscriber odom_sub = n.subscribe("vicon", 10, &vicon_callback, ros::TransportHints().udp());
-  odom_pub = n.advertise<robot_msgs::OdomNoCov>("odom", 10);
+  ros::Subscriber odom_sub = n.subscribe("vicon", 1, &vicon_callback, ros::TransportHints().udp());
+  odom_pub = n.advertise<robot_msgs::OdomNoCov>("odom", 1);
 
   ros::spin();
   return 0;
